@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>号码和日期历史记录</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .input-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .history-section {
+            margin-top: 30px;
+        }
+        .history-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        .history-item:hover {
+            background-color: #f0f0f0;
+        }
+        input, button {
+            padding: 8px;
+            margin: 5px 0;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #historyList {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>号码和日期记录</h1>
+    
+    <div class="input-section">
+        <h2>填写信息</h2>
+        <div>
+            <label for="number">号码：</label>
+            <input type="text" id="number" placeholder="请输入号码">
+        </div>
+        <div>
+            <label for="date">日期：</label>
+            <input type="date" id="date">
+        </div>
+        <button id="saveBtn">保存</button>
+    </div>
+    
+    <div class="history-section">
+        <h2>历史记录</h2>
+        <div id="historyList"></div>
+    </div>
+    
+    <script>
+        // 从本地存储加载历史记录
+        let history = JSON.parse(localStorage.getItem('numberDateHistory')) || [];
+        
+        // DOM元素
+        const numberInput = document.getElementById('number');
+        const dateInput = document.getElementById('date');
+        const saveBtn = document.getElementById('saveBtn');
+        const historyList = document.getElementById('historyList');
+        
+        // 保存按钮点击事件
+        saveBtn.addEventListener('click', () => {
+            const number = numberInput.value.trim();
+            const date = dateInput.value;
+            
+            if (!number || !date) {
+                alert('请填写号码和日期');
+                return;
+            }
+            
+            // 创建新记录
+            const record = {
+                id: Date.now(), // 使用时间戳作为唯一ID
+                number: number,
+                date: date,
+                timestamp: new Date().toLocaleString()
+            };
+            
+            // 添加到历史记录
+            history.unshift(record); // 添加到数组开头
+            localStorage.setItem('numberDateHistory', JSON.stringify(history));
+            
+            // 清空输入
+            numberInput.value = '';
+            dateInput.value = '';
+            
+            // 更新历史记录显示
+            renderHistory();
+            
+            alert('保存成功！');
+        });
+        
+        // 渲染历史记录
+        function renderHistory() {
+            historyList.innerHTML = '';
+            
+            if (history.length === 0) {
+                historyList.innerHTML = '<p>暂无历史记录</p>';
+                return;
+            }
+            
+            history.forEach(record => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.innerHTML = `
+                    <p><strong>号码：</strong>${record.number}</p>
+                    <p><strong>日期：</strong>${record.date}</p>
+                    <p><small>保存时间：${record.timestamp}</small></p>
+                `;
+                
+                // 点击历史记录项可以查看详情
+                item.addEventListener('click', () => {
+                    alert(号码: ${record.number}\n日期: ${record.date}\n保存时间: ${record.timestamp});
+                });
+                
+                historyList.appendChild(item);
+            });
+        }
+        
+        // 初始化时渲染历史记录
+        renderHistory();
+    </script>
+</body>
+</html>
